@@ -2,174 +2,555 @@
 ## Software Requirements Specification
 
 **Version:** 0.1  
-**Status:** Draft
+**Status:** Draft  
+**Product Mode:** Candidate Mode  
+**Initial Language:** English  
 
 ---
 
 ## 1. Introduction
 
 ### 1.1 Purpose
-    CVision AI is an AI-powered system designed to help job candidates evaluate how well their professional profile matches the requirements of a specific job opportunity.
 
-    The system aims to reduce the time and uncertainty involved in manually comparing a resume against a job description by identifying relevant strengths, missing or partially satisfied requirements, and areas for professional improvement.
+CVision AI is an AI-assisted system designed to help job candidates evaluate how well their documented professional profile aligns with the requirements of a specific job opportunity.
 
-    Rather than providing only a compatibility score, CVision AI aims to produce an explainable assessment supported by evidence extracted from both the candidate's resume and the job description.
+The system aims to reduce the time and uncertainty involved in manually comparing a resume against a job description by identifying relevant strengths, partially satisfied requirements, unsupported requirements, and areas for professional improvement.
+
+CVision AI shall produce an explainable assessment supported by evidence extracted from the candidate's resume and the job description.
+
+The system shall not treat the absence of evidence in a resume as proof that the candidate does not possess a qualification.
+
+---
 
 ### 1.2 Scope
-    The initial version of CVision AI will focus on individual job candidates who want to evaluate their resume against a specific job opportunity.
 
-    The system will accept one resume in PDF format and one job description as input. It will analyze both sources to identify relevant qualifications, strengths, missing or partially satisfied requirements, and evidence supporting the assessment.
+The initial version of CVision AI focuses on individual job candidates who want to evaluate one resume against one specific job opportunity.
 
-    The system will generate an explainable compatibility assessment intended to help candidates understand how their current professional profile aligns with the requirements stated in the job description.
+The MVP accepts:
 
-    #### In Scope
+- One resume in PDF format.
+- One job description provided as plain text.
 
-    - Upload and validation of one resume in PDF format.
-    - Input of one job description as plain text provided by the user.
-    - Extraction of relevant information from the resume.
-    - Identification of relevant requirements from the job description.
-    - Comparison between the candidate profile and job requirements.
-    - Identification of strengths, gaps, and partially satisfied requirements.
-    - Generation of an explainable compatibility score.
-    - Evidence supporting relevant analysis results.
-    - Recommendations based on identified gaps.
+The MVP analyzes:
 
-    #### Out of Scope for the MVP
+- Skills.
+- Professional experience.
+- Education.
+- Work authorization or eligibility when explicitly stated.
 
-    - Analysis or ranking of multiple candidates.
-    - Recruiter-specific workflows.
-    - DOCX and other resume formats.
-    - User accounts and authentication.
-    - Integration with external recruitment platforms or Applicant Tracking Systems (ATS).
-    - Automatic job applications.
-    - Interview simulation.
-    - Native mobile applications.
-    - Automatic extraction of job descriptions from external URLs.
-    - Job description file uploads.
+The system produces:
+
+- Matched requirements.
+- Partial matches.
+- Requirements for which no supporting evidence was found.
+- Requirements that cannot be reliably evaluated.
+- Supporting evidence.
+- Candidate strengths.
+- Relevant gaps.
+- Recommendations.
+- An explainable compatibility score.
+
+#### In Scope
+
+- Upload and validation of one resume in PDF format.
+- Processing of PDFs containing extractable text.
+- Acceptance of partially processable PDFs when sufficient text remains available.
+- Warning the user when parts of a PDF could not be processed.
+- Input of one job description as plain text.
+- Extraction of relevant candidate information.
+- Extraction of relevant job requirements.
+- Comparison between candidate evidence and job requirements.
+- Classification of requirement-level matches.
+- Evidence-backed analysis.
+- Explainable compatibility scoring.
+- Candidate-oriented recommendations.
+- Understandable error handling.
+- Initial support for English-language resumes and job descriptions.
+- Local CLI-based interaction for the first implementation.
+
+#### Out of Scope for the MVP
+
+- OCR for image-only or scanned resumes.
+- DOCX or other resume formats.
+- Analysis or ranking of multiple candidates.
+- Recruiter-specific workflows.
+- User accounts or authentication.
+- Persistent candidate databases.
+- Integration with Applicant Tracking Systems.
+- Automatic job applications.
+- Automatic extraction of job descriptions from URLs.
+- Job description file uploads.
+- Native mobile applications.
+- Multilingual analysis.
+- Automatic storage of personal candidate information.
+- Cloud deployment requirements.
+- External LLM or AI API dependency as a mandatory MVP requirement.
+
+---
 
 ### 1.3 Definitions and Terminology
 
-        Candidate 
-        The individual whose resume is being evaluated against a job description.
+**Candidate**  
+The individual whose resume is being evaluated against a job description.
 
-        Resume (CV) 
-        A document containing information about a candidate's professional experience, education, skills, projects, and other relevant qualifications.
+**Resume (CV)**  
+A document containing information about a candidate's professional experience, education, skills, projects, and other relevant qualifications.
 
-        Job Description (JD) 
-        The text describing a job opportunity, including its responsibilities, qualifications, skills, experience, and other requirements.
+**Job Description (JD)**  
+Text describing a job opportunity, including responsibilities, qualifications, skills, experience, and other requirements.
 
-        Job Requirement
-        A qualification, skill, experience, or condition requested or preferred in the job description.
+**Job Requirement**  
+A skill, qualification, experience level, education requirement, work-authorization condition, or other explicitly stated condition associated with the job.
 
-        Strength 
-        A candidate qualification supported by evidence in the resume that is relevant to a requirement in the job description.
+**Evidence**  
+Information contained in the resume or job description that supports an analysis result.
 
-        Gap
-        A job requirement for which sufficient supporting evidence cannot be identified in the candidate's resume.
+**Match**  
+A job requirement for which the resume contains sufficient supporting evidence to reasonably conclude that the documented candidate profile satisfies the requirement.
 
-        Partial Match 
-        A job requirement that is supported by some evidence in the resume but is not fully satisfied based on the available information.
+**Partial Match**  
+A job requirement for which relevant supporting evidence exists, but the available evidence is insufficient to conclude that the requirement is fully satisfied.
 
-        Evidence
-        Information extracted from the resume or job description that supports an analysis result.
+**No Evidence**  
+A job requirement for which no relevant supporting evidence can be identified in the resume.
 
-        Match Score
-        A numerical representation of the degree of alignment between the candidate's documented profile and the requirements identified in the job description.
+No Evidence shall not be interpreted as proof that the candidate does not possess the corresponding qualification.
 
-        MVP (Minimum Viable Product)
-        The smallest functional version of CVision AI that delivers the core candidate-to-job analysis.
+**Not Evaluable**  
+A job requirement for which the system cannot make a reliable assessment from the available information.
+
+**Strength**  
+A relevant candidate qualification supported by evidence in the resume and aligned with one or more job requirements.
+
+**Gap**  
+A job requirement that is not sufficiently supported by the available resume evidence.
+
+A gap describes the relationship between the documented resume and the job requirement, not necessarily the candidate's actual abilities.
+
+**Compatibility Score**  
+A numerical representation of the degree of documented alignment between the resume and the evaluated job requirements.
+
+The compatibility score shall not represent:
+
+- Probability of receiving an interview.
+- Probability of being hired.
+- Overall candidate quality.
+- Personal suitability for the job.
+
+**MVP (Minimum Viable Product)**  
+The smallest functional version of CVision AI that delivers the core candidate-to-job analysis.
+
+---
 
 ## 2. Functional Requirements
 
- ### FR-001 — Resume Upload
+### FR-001 — Resume Input
 
-The system shall allow the candidate to upload one resume in PDF format for analysis.
+The system shall allow the candidate to provide one resume in PDF format for analysis.
 
 ### FR-002 — Job Description Input
 
-The system shall allow the candidate to provide one job description as plain text for analysis.
+The system shall allow the candidate to provide one job description as plain text.
 
 ### FR-003 — Resume Validation
 
-The system shall validate the uploaded resume before processing and reject files that are invalid, unsupported, corrupted, or otherwise not processable.
+The system shall validate the uploaded resume before analysis.
 
-### FR-004 — Resume Text Extraction
+The system shall reject a resume when:
 
-The system shall extract processable textual content from the uploaded resume.
+- The file is not a supported PDF.
+- The file cannot be opened.
+- The file is encrypted or otherwise inaccessible.
+- No extractable textual content can be obtained.
 
-### FR-005 — Candidate Information Extraction
+### FR-004 — Partial PDF Processing
 
-The system shall identify relevant candidate information from the resume, including skills, professional experience, education, and other qualifications relevant to the job analysis.
+If some PDF pages contain extractable text and other pages cannot be processed, the system may continue the analysis using the available content.
 
-### FR-006 — Job Requirement Extraction
+The system shall clearly indicate that the analysis was performed using incomplete document content.
 
-The system shall identify relevant requirements from the job description, including skills, experience, education, and other stated qualifications.
+Unprocessed pages shall not be treated as negative evidence about the candidate.
 
-### FR-007 — Requirement Matching
+### FR-005 — Resume Text Extraction
 
-The system shall compare the candidate's documented qualifications against the identified job requirements.
+The system shall extract processable textual content from the resume.
 
-### FR-008 — Match Classification
+### FR-006 — Candidate Information Extraction
 
-The system shall classify relevant job requirements according to the degree of supporting evidence found in the resume, including matched, partially matched, and unsupported requirements.
+The system shall identify relevant candidate information, including:
 
-### FR-009 — Evidence Generation
+- Skills.
+- Professional experience.
+- Education.
+- Work authorization or eligibility when explicitly documented.
 
-The system shall provide evidence from the resume and job description to support relevant matching results.
+### FR-007 — Job Requirement Extraction
 
-### FR-010 — Compatibility Score
+The system shall identify relevant job requirements, including:
 
-The system shall generate an explainable compatibility score representing the degree of alignment between the candidate's documented profile and the identified job requirements.
+- Required or preferred skills.
+- Experience requirements.
+- Education requirements.
+- Work authorization or eligibility requirements when stated.
 
-### FR-011 — Strength and Gap Identification
+### FR-008 — Requirement Matching
 
-The system shall identify relevant candidate strengths and gaps with respect to the analyzed job description.
+The system shall compare identified job requirements against evidence found in the resume.
 
-### FR-012 — Candidate Recommendations
+### FR-009 — Match Classification
 
-The system shall provide recommendations based on identified gaps and partially satisfied requirements without representing unsupported qualifications as facts.
+The system shall classify each evaluated requirement as one of:
 
-### FR-013 — Error Handling
+- Match.
+- Partial Match.
+- No Evidence.
+- Not Evaluable.
 
-The system shall provide understandable error information when an analysis cannot be completed without causing the application to terminate unexpectedly.
+### FR-010 — Evidence Association
+
+For relevant analysis results, the system shall associate the conclusion with supporting evidence from the resume and/or job description.
+
+### FR-011 — Provenance
+
+When technically available, the system shall preserve sufficient source information to determine where relevant evidence originated.
+
+### FR-012 — Strength Identification
+
+The system shall identify relevant candidate strengths supported by resume evidence.
+
+### FR-013 — Gap Identification
+
+The system shall identify requirements that are partially supported, unsupported, or not evaluable from the available resume evidence.
+
+### FR-014 — Compatibility Score
+
+The system shall generate a compatibility score representing documented alignment between the candidate profile and the evaluated job requirements.
+
+The score shall be explainable through the underlying requirement-level analysis.
+
+### FR-015 — Recommendations
+
+The system shall provide candidate-oriented recommendations based on:
+
+- Partial matches.
+- Requirements with insufficient evidence.
+- Relevant weaknesses in how qualifications are demonstrated.
+
+Recommendations shall not instruct the candidate to claim qualifications that are not supported by their actual experience.
+
+### FR-016 — Unsupported Inference Protection
+
+The system shall not present unsupported assumptions about a candidate as confirmed facts.
+
+### FR-017 — Insufficient Information Handling
+
+The system shall indicate when insufficient information prevents a reliable assessment of a requirement.
+
+### FR-018 — Error Handling
+
+The system shall provide understandable error messages when processing cannot be completed.
+
+A processing failure shall not cause the application to terminate unexpectedly when the error can be handled safely.
+
+### FR-019 — Language Handling
+
+The MVP shall support English-language resumes and job descriptions.
+
+When the system determines that the input cannot be reliably processed under the supported language scope, it shall inform the user rather than silently presenting the analysis as fully reliable.
 
 ---
 
 ## 3. Non-Functional Requirements
 
-### NFR-001 — Performance
+### NFR-001 — Explainability
 
-Under normal operating conditions, the system should complete a single candidate-job analysis within a defined acceptable response-time target.
+Relevant analysis results shall be traceable to supporting evidence or explicitly identified as uncertain or not evaluable.
 
 ### NFR-002 — Reliability
 
-Invalid or unsupported input shall not cause the application to terminate unexpectedly.
+Invalid, unsupported, or partially processable input shall be handled without causing uncontrolled application failure.
 
 ### NFR-003 — Privacy
 
-Resume content and extracted candidate information shall not be exposed to unauthorized users or publicly accessible by default.
+Resume content and extracted candidate information shall not be publicly exposed by default.
 
-### NFR-004 — Security
+The initial implementation shall prioritize local processing.
 
-The system shall validate untrusted user input before processing and shall apply appropriate safeguards when handling uploaded documents.
+### NFR-004 — Data Minimization
 
-### NFR-005 — Maintainability
+The MVP shall avoid persistent storage of personal candidate information unless storage becomes necessary for an explicitly introduced feature.
 
-The system shall be organized into modular components with clearly defined responsibilities to support testing, modification, and extension.
+### NFR-005 — Security
 
-### NFR-006 — Testability
+User-provided files and text shall be treated as untrusted input and validated before processing.
 
-Core processing and matching components shall be designed so that their expected behavior can be verified through automated tests.
+### NFR-006 — Maintainability
 
-### NFR-007 — Usability
+The system shall be organized into components with clearly defined responsibilities.
 
-Analysis results and error messages shall be presented in language understandable to the intended user without requiring technical knowledge of the underlying AI system.
+### NFR-007 — Testability
 
-### NFR-008 — Explainability
+Core validation, extraction, matching, and scoring behavior shall be designed so that it can be verified through automated tests.
 
-Relevant matching results shall be traceable to supporting information from the resume, the job description, or explicitly identified system inference.
+### NFR-008 — Extensibility
 
-### NFR-009 — Extensibility
+The architecture should allow future capabilities such as OCR, APIs, alternative document formats, recruiter workflows, and additional analysis methods without requiring a complete rewrite of the core domain logic.
 
-The system architecture shall allow additional input formats, analysis capabilities, and user workflows to be introduced without requiring a complete redesign of the core analysis pipeline.
+### NFR-009 — Interface Independence
 
+Core analysis logic shall not depend directly on the CLI interface.
+
+### NFR-010 — Usability
+
+Results and error messages shall be understandable to a job candidate without requiring knowledge of the underlying AI or implementation details.
+
+### NFR-011 — Performance
+
+The system shall provide acceptable response time for interactive analysis of one resume and one job description.
+
+A numerical performance target shall be established after implementation measurements provide evidence for a realistic threshold.
+
+### NFR-012 — Reproducibility
+
+Given the same supported input and deterministic processing configuration, deterministic components of the system should produce consistent results.
+
+---
+
+## 4. Use Cases
+
+### UC-001 — Provide Resume
+
+**Primary Actor:** Candidate
+
+**Goal:**  
+Provide a resume for analysis.
+
+**Preconditions:**
+
+- The application is available.
+- The candidate has access to a resume file.
+
+**Main Flow:**
+
+1. The candidate selects one PDF resume.
+2. The system receives the document.
+3. The system validates the PDF.
+4. The system determines whether extractable textual content is available.
+5. The system accepts the resume for analysis.
+
+**Alternative / Error Flows:**
+
+- Unsupported file format → reject input.
+- Corrupted PDF → reject input.
+- Encrypted or inaccessible PDF → reject input.
+- No extractable text → reject input and explain that OCR is not supported in the MVP.
+- Partial text extraction → continue with a warning if sufficient content remains.
+
+**Postconditions:**
+
+- A processable resume is available for analysis, or the user has received an understandable error.
+
+---
+
+### UC-002 — Provide Job Description
+
+**Primary Actor:** Candidate
+
+**Goal:**  
+Provide the target job description.
+
+**Preconditions:**
+
+- The application is available.
+
+**Main Flow:**
+
+1. The candidate provides the job description as plain text.
+2. The system validates that usable content exists.
+3. The system accepts the text for analysis.
+
+**Alternative / Error Flows:**
+
+- Empty or unusable input → reject input and explain the problem.
+
+**Postconditions:**
+
+- A processable job description is available.
+
+---
+
+### UC-003 — Analyze Candidate-Job Alignment
+
+**Primary Actor:** Candidate
+
+**Goal:**  
+Evaluate documented alignment between the resume and job requirements.
+
+**Preconditions:**
+
+- A valid resume is available.
+- A valid job description is available.
+
+**Main Flow:**
+
+1. The system extracts relevant resume information.
+2. The system extracts relevant job requirements.
+3. The system evaluates each supported requirement category.
+4. The system associates available evidence.
+5. The system classifies each evaluated requirement.
+6. The system determines relevant strengths and gaps.
+7. The system calculates the compatibility score.
+8. The system produces recommendations.
+9. The system prepares an explainable result.
+
+**Alternative / Error Flows:**
+
+- Insufficient resume evidence → affected requirements may be classified as No Evidence or Not Evaluable.
+- Insufficient job-description information → affected requirements may be marked Not Evaluable.
+- Partial PDF extraction → analysis continues with an explicit limitation warning.
+- Processing failure → incomplete output shall not be presented as a fully valid analysis.
+
+**Postconditions:**
+
+- An analysis result exists or the user receives an explanation of why a reliable analysis could not be completed.
+
+---
+
+### UC-004 — Review Analysis Results
+
+**Primary Actor:** Candidate
+
+**Goal:**  
+Understand how the documented candidate profile aligns with the selected job opportunity.
+
+**Preconditions:**
+
+- Analysis has completed successfully or with explicitly reported limitations.
+
+**Main Flow:**
+
+1. The candidate reviews the compatibility score.
+2. The candidate reviews matched requirements.
+3. The candidate reviews partial matches.
+4. The candidate reviews requirements with no identified evidence.
+5. The candidate reviews requirements marked Not Evaluable.
+6. The candidate reviews supporting evidence.
+7. The candidate reviews recommendations.
+8. The candidate reviews any processing limitations or warnings.
+
+**Postconditions:**
+
+- The candidate can understand both the analysis conclusions and the evidence or uncertainty supporting them.
+
+---
+
+### UC-005 — Handle Invalid Input
+
+**Primary Actor:** Candidate
+
+**Goal:**  
+Receive clear feedback when unsupported or unusable input is provided.
+
+**Main Flow:**
+
+1. The system detects invalid or unsupported input.
+2. Processing of that input is stopped.
+3. The system provides an understandable explanation.
+4. The application remains available for another attempt.
+
+**Postconditions:**
+
+- Invalid input has not been interpreted as valid candidate data.
+- The application remains operational.
+
+---
+
+## 5. Acceptance Criteria
+
+The MVP shall be considered functionally acceptable when the following conditions are satisfied.
+
+### AC-001 — Valid Resume
+
+Given a valid text-based PDF resume, when the candidate provides the document, then CVision AI shall extract usable textual content.
+
+### AC-002 — Invalid Resume Format
+
+Given an unsupported file format, when the candidate attempts to provide it as a resume, then the system shall reject it with an understandable message.
+
+### AC-003 — Image-Only Resume
+
+Given a PDF containing no extractable text, when the system attempts to process it, then the PDF shall be rejected and the user shall be informed that OCR is outside the MVP.
+
+### AC-004 — Partially Processable Resume
+
+Given a PDF containing both processable and non-processable pages, when sufficient text remains available, then the system may continue the analysis and shall display a limitation warning.
+
+### AC-005 — Job Description
+
+Given non-empty supported English job-description text, the system shall accept the content for analysis.
+
+### AC-006 — Requirement Extraction
+
+Given a supported job description containing relevant skills, experience, education, or work-authorization requirements, the system shall identify applicable requirements for evaluation.
+
+### AC-007 — Match Classification
+
+For each evaluated requirement, the system shall produce one supported classification:
+
+- Match.
+- Partial Match.
+- No Evidence.
+- Not Evaluable.
+
+### AC-008 — Evidence
+
+Relevant Match and Partial Match conclusions shall include supporting evidence when such evidence is available.
+
+### AC-009 — No Evidence Semantics
+
+When no evidence for a requirement is identified in the resume, the system shall not state that the candidate definitively lacks the corresponding qualification.
+
+### AC-010 — Unsupported Claims
+
+The system shall not present unsupported candidate qualifications as confirmed facts.
+
+### AC-011 — Explainable Score
+
+The compatibility score shall be traceable to the evaluated requirements and shall not be presented as a probability of being interviewed or hired.
+
+### AC-012 — Recommendations
+
+Recommendations shall relate to identified gaps, partial matches, or insufficiently demonstrated qualifications and shall not encourage fabrication of experience.
+
+### AC-013 — Error Resilience
+
+Expected invalid-input conditions shall not cause uncontrolled application termination.
+
+### AC-014 — Privacy
+
+The initial MVP shall not require persistent storage of real candidate resume content to perform a single local analysis.
+
+### AC-015 — Core / Interface Separation
+
+Core analysis behavior shall be usable independently of the CLI implementation.
+
+---
+
+## 6. MVP Limitations
+
+The initial MVP intentionally accepts the following limitations:
+
+- PDF resumes only.
+- Extractable-text PDFs only.
+- OCR is not supported.
+- English language only.
+- Single candidate analysis only.
+- Single job description only.
+- Local CLI interaction.
+- No persistent candidate database.
+- No recruiter ranking.
+- No job-board scraping.
+- No guaranteed analysis of information that is absent, ambiguous, or inaccessible.
+- No claim that the compatibility score predicts hiring outcomes.
+
+These limitations may be revisited in future versions based on product needs and evaluation results.
